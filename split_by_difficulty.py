@@ -1,7 +1,7 @@
 import numpy as np
 from utils import *
 
-shape_set = 2
+shape_set = 3
 path_src = f'./shapes_{shape_set}/'
 SC = np.loadtxt(path_src + 'SC.txt', dtype='f', delimiter=',')
 D = distance_matrix(SC, SC)
@@ -28,6 +28,5 @@ for i, r in enumerate(cat_ranges):
 
         dir_dest = path_dest + f'cat_{category_ID}/' + f'diff_{diff_level}/'
 
-        if shape_ID != prototype_ID :
-            copy_shape(shape_ID, diff_level, category_ID, path_src, dir_dest)
+        copy_shape(shape_ID, diff_level, category_ID, path_src, dir_dest)
         

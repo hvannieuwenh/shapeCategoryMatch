@@ -9,7 +9,7 @@ const N_difficulty_levels = 5;
 const N_exemplars_per_difficulty = 17;
 const N_trials_per_difficulty = 5;
 
-const incorrect_penalty = 0.1;
+const incorrect_penalty = -0.1;
 
 var additional_bonus = 0.0;
 const T_additional_bonus_1 = 3; // minutes
@@ -23,7 +23,7 @@ var current_stimulus = 0;
 
 var timeline = []; 
 
-const pack_name = "pack_noise_shapes_1"
+const pack_name = "pack_noise_shapes_3"
 const stim_path = "./stimuli/" ;
 const stimulus_format = "mp4";
 
@@ -273,7 +273,7 @@ var feedback_test = {
     },
     stimulus: function(){
         const last_trial = jsPsych.data.get().filter({task: 'response'}).last(1).values()[0];
-        const is_score_zero = !(score >= incorrect_penalty);
+        const is_score_zero = !(score >= Math.abs(incorrect_penalty));
         if (last_trial.response) {
             if(last_trial.correct){
                 trial_bonus = RT_to_reward(last_trial.rt) + additional_bonus;
@@ -349,7 +349,7 @@ var intermission = {
     stimulus: `
             <b> <p> The practice round has finished.</p>
             <b> <p> For the rest of the experiment you will receive a bonus payment for each correct answer, which will be higher the faster you answer!</b></p>
-            <b> <p> Also you will lose $0.05 from your bonus payment for each incorrect answer!</p>
+            <b> <p> Also you will lose $0.1 from your bonus payment for each incorrect answer!</p>
             <p> Press any key to begin the test. </p>
             `,
     data: {task: 'intermission'}
