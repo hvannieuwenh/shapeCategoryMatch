@@ -26,21 +26,33 @@ def find_in_object(obj, name, value):
         if x[name] == value:
             return i
 
+fontsize = 0.039
+keylist = ['right','left']
 
 core.checkPygletDuringWait = False
 
-win = visual.Window(size=(800,600), fullscr=False, color=(-1,-1,-1), allowGUI=True, monitor='testMonitor', units='height')
+win = visual.Window(size=(800,600), fullscr=True, color=(-1,-1,-1), allowGUI=True, monitor='testMonitor', units='height')
 
 msg_welcome = visual.TextBox2(
     win, 
     pos=[0, 0], 
+    letterHeight = fontsize,
     text="Welcome to the Category Learning experiment! Press any key to continue.",
+    alignment='center'
+)
+
+msg_wait = visual.TextBox2(
+    win, 
+    pos=[0, 0], 
+    letterHeight = fontsize,
+    text="Waiting for scanner...",
     alignment='center'
 )
 
 msg_intro_1 = visual.TextBox2(
     win, 
     pos=[0, 0], 
+    letterHeight = 0.03,
     text="""
         This task is divided into trials. In each trial you will see a white shape.\n 
         After a short delay you will see two other shapes, one left and one right. \n
@@ -56,6 +68,7 @@ msg_intro_1 = visual.TextBox2(
 msg_intro_2 = visual.TextBox2(
     win, 
     pos=[0, 0], 
+    letterHeight = fontsize,
     text="""
         The first 10 trials are a practice round that will not count towards your bonus payment.\n
         You will be notified when practice finishes and the test begins.\n
@@ -67,6 +80,7 @@ msg_intro_2 = visual.TextBox2(
 ITI = visual.TextBox2(
     win, 
     pos=[0, 0], 
+    letterHeight = fontsize,
     text="Please press any button to continue to the next trial.",
     alignment='center'
 )
@@ -92,7 +106,8 @@ score = visual.TextBox2(
 
 kb = keyboard.Keyboard()
 
-T_experiment = 10 # minutes
+#T_experiment = 11 # minutes
+T_experiment = 11 
 T_stim = 1 # seconds
 T_choice = 4 # seconds
 T_delay = 0.85 # seconds
@@ -132,8 +147,10 @@ for i in range(N_difficulty_levels) :
         shapes_test = [f for f in files if f not in shapes_train]
 
 
-        #correct_response = 'right' if j == 1 else 'left'
-        correct_response = ['1','2','3','4','5'] if j == 1 else ['6','7','8','9','0']
+        correct_response = 'right' if j == 1 else 'left'
+        #correct_response = ['1','2','3','4','5'] if j == 1 else ['6','7','8','9','0']
+        
+        #correct_response = ['5','6','7','8'] if j == 1 else ['9']
         
         stim_test[i] += [
             {
@@ -181,22 +198,17 @@ exp = data.ExperimentHandler(
 
 msg_intro_1.draw()
 win.flip()
-keys = kb.waitKeys()
+keys = kb.waitKeys(keyList=keylist)
 
 msg_intro_2.draw()
 win.flip()
-keys = kb.waitKeys()
+keys = kb.waitKeys(keyList=keylist)
 
 #-------------------
 #--Training trials--
 #-------------------
 for trial in trial_handler:
     stim = trial['stimulus']
-
-    ITI.draw()
-    score.draw()
-    win.flip()
-    keys = kb.waitKeys()
 
     stim.draw()
     score.draw()
@@ -225,7 +237,7 @@ for trial in trial_handler:
     win.callOnFlip(kb.clock.reset)
     win.flip()
 
-    keys = kb.waitKeys(maxWait=T_choice, keyList=['left', 'right'])
+    keys = kb.waitKeys(maxWait=T_choice, keyList=keylist)
 
     correct = 0 
     T_feedback = 0
@@ -262,15 +274,21 @@ for trial in trial_handler:
     score.draw()
     win.flip()
     core.wait(T_feedback)
+    
+    ITI.draw()
+    score.draw()
+    win.flip()
+    keys = kb.waitKeys(keyList=keylist)
 
-    if 'escape' in event.waitKeys():
-        exp.saveAsWideText('output.csv')
-        win.close()
-        core.quit()
+    #if 'escape' in event.waitKeys():
+        #exp.saveAsWideText('output.csv')
+        #win.close()
+        #core.quit()
 
 intermission = visual.TextBox2(
     win, 
     pos=[0, 0], 
+    letterHeight = fontsize,
     text="""
         The practice round has finished. \n
         For the rest of the experiment you will receive a $0.05 bonus for each correct answer and lose $0.05 from your bonus for each incorrect answer! \n
@@ -281,7 +299,14 @@ intermission = visual.TextBox2(
 )
 intermission.draw()
 win.flip()
-keys = kb.waitKeys()
+keys = kb.waitKeys(keyList=keylist)
+
+msg_wait.draw()
+win.flip()
+epi_kb = keyboard.Keyboard()
+epi_keys = epi_kb.getKeys()
+keys = epi_kb.waitKeys(keyList=['equal'])
+epi_clock = core.Clock() 
 
 timer = core.CountdownTimer(T_experiment * 60)
 #-------------------
@@ -297,18 +322,18 @@ while timer.getTime() > 0 :
 
     stim = trial['stimulus']
 
-    ITI.draw()
-    score.draw()
-    win.flip()
-    keys = kb.waitKeys()
-
     stim.draw()
     score.draw()
     win.flip()
+    stim_time = epi_clock.getTime()
+    exp.addData('stimulus_ID', trial['stimulus_ID'])
+    exp.addData('stim presentation time', stim_time)
     core.wait(T_stim)
     
     score.draw()
     win.flip()
+    delay_time = epi_clock.getTime()
+    exp.addData('delay presentation time', delay_time)
     core.wait(T_delay)
 
     random.shuffle(prototypes)
@@ -327,8 +352,10 @@ while timer.getTime() > 0 :
 
     win.callOnFlip(kb.clock.reset)
     win.flip()
+    AB_time = epi_clock.getTime()
+    exp.addData('AB presentation time', AB_time)
 
-    keys = kb.waitKeys(maxWait=T_choice, keyList=['left', 'right'])
+    keys = kb.waitKeys(maxWait=T_choice, keyList=keylist)
     correct = 0 
     T_feedback = 0
     trial_bonus = 0
@@ -359,7 +386,7 @@ while timer.getTime() > 0 :
     exp.addData('difficulty', trial['difficulty'])
     exp.addData('category', trial['category'])
     exp.addData('phase', trial['phase'])
-    exp.nextEntry()
+    #exp.nextEntry()
 
     past_data.appendleft({'correct' : correct, 'difficulty' : trial['difficulty']})
 
@@ -367,12 +394,28 @@ while timer.getTime() > 0 :
     feedback.draw()
     score.draw()
     win.flip()
+    feedback_time = epi_clock.getTime()
+    exp.addData('feedback presentation time', feedback_time)
     core.wait(T_feedback)
+    
+    ITI.draw()
+    score.draw()
+    win.flip()
+    ITI_time = epi_clock.getTime()
+    exp.addData('ITI presentation time', ITI_time)
+    keys = kb.waitKeys(keyList=keylist)
+    iti_keys = kb.waitKeys(keyList=keylist)
+    if not iti_keys:
+        rt = None
+    else:
+        rt = iti_keys[-1].rt
+    exp.addData('ITI response time', rt)
+    exp.nextEntry()
 
-    if 'escape' in event.waitKeys():
-        exp.saveAsWideText('output.csv')
-        win.close()
-        core.quit()
+    #if 'escape' in event.waitKeys():
+        #exp.saveAsWideText('output.csv')
+        #win.close()
+        #core.quit()
 
 win.close()
 core.quit()
