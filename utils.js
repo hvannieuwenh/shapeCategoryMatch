@@ -39,7 +39,7 @@ function wrap_stim_in_html(stimulus, score){
 function wrap_video_stim_in_html(stimulus, score){
     txt = `
         ${wrap_score_in_html(score)}
-        <video class="stim" src=${stimulus}></video>    
+        <video autoplay class="stim" src=${stimulus}></video>    
     `;
     return txt
 }
@@ -64,27 +64,27 @@ function wrap_wrong_feedback_in_html(stimulus, category){
 }
 
 function positive_feedback(gain){
-    return `<p> <font color="green" size="5vw"> Correct category! </font> <br> <br> <font color="green" size="8vw"> + $${gain} </font> </p>`;
+    return `<p> <font color="green" size="5vw"> Correct match! </font> <br> <br> <font color="green" size="8vw"> + $${gain} </font> </p>`;
 }
 
 function positive_feedback_no_bonus(){
-    return `<p><font color="green" size="5vw"> Correct category! </font></p>`;
+    return `<p><font color="green" size="5vw"> Correct match! </font></p>`;
 }
 
 function negative_feedback(loss){
-    return `<p> <font color="red" size="5vw"> Wrong category! </font> <br> <br> <font color="red" size="8vw"> - $${Math.abs(loss)} </font> </p>`;
+    return `<p> <font color="red" size="5vw"> Wrong match! </font> <br> <br> <font color="red" size="8vw"> - $${Math.abs(loss)} </font> </p>`;
 }
 
 function negative_feedback_no_bonus(){
-    return `<p> <font color="red" size="5vw"> Wrong category! </font> </p>`
+    return `<p> <font color="red" size="5vw"> Wrong match! </font> </p>`
 }
 
 function timeout_feedback(loss){
-    return `<p> <font color="red" size="5vw"> Time out! </font> <br> <br> <font color="red" size="8vw"> - $${Math.abs(loss)} </font> <br> <br> Please try to respond as quickly as possible. </p>`
+    return `<p> <font color="red" size="5vw"> Time out! </font> <br> <br> <font color="red" size="8vw"> - $${Math.abs(loss)} </font> <br> <br> Please try to choose as quickly as possible. </p>`
 }
 
 function timeout_feedback_no_bonus(){
-    return `<p> <font color="red" size="5vw"> Time out! </font> <br> <br> Please try to respond as quickly as possible. </p>`
+    return `<p> <font color="red" size="5vw"> Time out! </font> <br> <br> Please try to choose as quickly as possible. </p>`
 }
 
 function* range_iter(start, end) {
@@ -97,9 +97,11 @@ function range(start, end) {
     return Array.from(range_iter(start, end))
 }
 
+
 function exemplar_stimulus(idx, stim_path, pack_name, category, difficulty, phase, format){
     return {
         stimulus: `${stim_path}/${pack_name}/cat_${category}/diff_${difficulty}/ex_${category}_${difficulty}_${idx}.${format}`, 
+        correct_response: (category == 1) ? `ArrowLeft` : `ArrowRight`,
         exemplar_ID: idx,
         category: category,
         difficulty: difficulty,
@@ -145,6 +147,6 @@ function sample_stimulus(stimuli, difficulty){
 
 function RT_to_reward(RT){
     max_reward = 0.1
-    decay = 0.5
+    decay = 0.2
     return max_reward * Math.exp(-decay * (RT/1000))
 }

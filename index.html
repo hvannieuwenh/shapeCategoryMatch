@@ -16,6 +16,18 @@
         top: 20vh;
         width: 28vw;
     }
+    .left_prototype {
+        position: absolute;
+        left: 5vw;
+        top: 30vh;
+        width: 2vw;
+    }
+    .right_prototype {
+        position: absolute;
+        right: 5vw;
+        top: 30vh;
+        width: 2vw;
+    }
     .left_stim {
         position: absolute;
         left: 18vw;
@@ -27,6 +39,27 @@
         right: 18vw;
         top: 20vh;
         width: 24vw;
+    }
+    .container {
+        display: flex;
+        flex-direction: row;
+        flex-grow: 1;
+        gap: 10vw;
+    }
+    .photos{
+        display:flex;
+        justify-content:center;
+        flex-direction: column;
+        flex-grow: 1;
+    }
+    .image{
+            display:block;
+            width:22vw;
+    }
+    .word{
+            display:block;
+            width: 100%;
+            text-align:center;
     }
     body {
       background-color: black;
@@ -42,6 +75,6 @@
     <script src="jatos.js"></script>
     <link href="https://unpkg.com/jspsych@7.3.3/css/jspsych.css" rel="stylesheet" type="text/css" />
     <script src="utils.js"></script>
-    <script src="experiment.js"></script>
+    <script src="experiment_noise_dm.js"></script>
   </head>
 </html>
